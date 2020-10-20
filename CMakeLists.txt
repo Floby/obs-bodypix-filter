@@ -1,0 +1,10 @@
+cmake_minimum_required(VERSION 3.1)
+# Enable C++11
+#set(CMAKE_CXX_STANDARD 11)
+#set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+#set(OpenCV_DIR /home/floby/opt/opencv/opencv/build/cmake)
+project( DisplayImage )
+find_package( OpenCV REQUIRED )
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+add_executable( DisplayImage DisplayImage.cpp )
+target_link_libraries( DisplayImage ${OpenCV_LIBS} )
