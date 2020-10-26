@@ -3,6 +3,8 @@
 
 using namespace cv;
 
+const int NORMAL_HEIGHT = 420;
+
 Mat hflip (Mat& original) {
   Mat flipped;
   flip(original, flipped, 1);
@@ -29,17 +31,28 @@ Mat addAlpha (Mat image, Mat alpha) {
 }
 
 cv::Mat removeBackground (cv::Mat frame, int smoothing) {
-  Mat result;
-  Mat flipped = hflip(frame);
-  Mat leftMask = getMask(frame);
+  Mat result, processingFrame;
+  Size originalSize = frame.size();
+  if (originalSize.height > NORMAL_HEIGHT) {
+    float resizeFactor = 1.0 * NORMAL_HEIGHT / originalSize.height;
+    int processingHeight = static_cast<int>(originalSize.height * resizeFactor);
+    int processingWidth = static_cast<int>(originalSize.width * resizeFactor);
+    resize(frame, processingFrame, Size(processingWidth, processingHeight), 0, 0, INTER_AREA);
+  } else {
+    processingFrame = frame;
+  }
+  Mat flipped = hflip(processingFrame);
+  Mat leftMask = getMask(processingFrame);
   Mat rightMask = getMask(flipped);
   rightMask = hflip(rightMask);
   Mat mask = leftMask*0.5 + rightMask*0.5;
   threshold(mask, mask, 250, 255, THRESH_BINARY);
 
   mask = postProcessMask(mask, smoothing);
+  Mat resizedMask;
+  resize(mask, resizedMask, frame.size(), 0, 0, INTER_CUBIC);
 
-  multiply(frame, mask, result, 1.0/255);
+  multiply(frame, resizedMask, result, 1.0/255);
   return result;
 }
 
