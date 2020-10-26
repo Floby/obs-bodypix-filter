@@ -18,19 +18,14 @@ Mat postProcessMask (Mat &mask, int smoothing) {
   return processed;
 }
 
-Mat addAlpha (Mat image, Mat alpha) {
-  std::vector<Mat> channels;
-  std::vector<Mat> alphaChannels;
-  split(image, channels);
-  split(alpha, alphaChannels);
-  channels[3] = alphaChannels[0];
-  Mat transparent;
-  merge(channels, transparent);
-  waitKey();
-  return transparent;
+Mat removeBackground (Mat frame, int smoothing) {
+  Mat mask, result;
+  mask = extractMask(frame, smoothing);
+  multiply(frame, mask, result, 1.0/255);
+  return result;
 }
 
-cv::Mat removeBackground (cv::Mat frame, int smoothing) {
+Mat extractMask (Mat frame, int smoothing) {
   Mat result, processingFrame;
   Size originalSize = frame.size();
   if (originalSize.height > NORMAL_HEIGHT) {
@@ -52,7 +47,6 @@ cv::Mat removeBackground (cv::Mat frame, int smoothing) {
   Mat resizedMask;
   resize(mask, resizedMask, frame.size(), 0, 0, INTER_CUBIC);
 
-  multiply(frame, resizedMask, result, 1.0/255);
-  return result;
+  return resizedMask;
 }
 

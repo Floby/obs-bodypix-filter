@@ -22,6 +22,7 @@ int main(int argc, char** argv ) {
   }
   string imageName = argv[1];
   Mat frame = cv::imread(imageName, 1);
+  show (extractMask(frame, 5));
   show (removeBackground(frame, 5));
 }
 
